@@ -1,0 +1,2 @@
+/Users/macbook/Desktop/Ranjeet/LinPhoneSDK-Flutter-master/example/android/app/.cxx/Debug/5sl5c6e1/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/macbook/Desktop/Ranjeet/LinPhoneSDK-Flutter-master/example/android/app/.cxx/Debug/5sl5c6e1/arm64-v8a/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,2 @@
+/Users/macbook/Desktop/Ranjeet/Africall_Flutter/Africall/android/app/.cxx/RelWithDebInfo/1a3z1m2u/x86_64/CMakeFiles/edit_cache.dir
+/Users/macbook/Desktop/Ranjeet/Africall_Flutter/Africall/android/app/.cxx/RelWithDebInfo/1a3z1m2u/x86_64/CMakeFiles/rebuild_cache.dir
