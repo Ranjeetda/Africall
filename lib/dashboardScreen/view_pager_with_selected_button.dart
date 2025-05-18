@@ -1,11 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:linphonesdk_example/dashboardScreen/home_screen.dart';
 import 'package:linphonesdk_example/resourse/Utils.dart';
 import 'package:linphonesdk_example/resourse/app_colors.dart';
+import 'package:provider/provider.dart';
 
 import '../callLogScreen/call_log_screen.dart';
 import '../contactScreen/contacts_page.dart';
 import '../moreScreen/more_screen.dart';
+import '../provider/flash_message_provider.dart';
 import '../resourse/image_paths.dart';
 
 class ViewPagerWithSelectedButton extends StatefulWidget {
@@ -16,7 +19,7 @@ class ViewPagerWithSelectedButton extends StatefulWidget {
 
 class _ViewPagerWithSelectedButtonState extends State<ViewPagerWithSelectedButton> {
    final PageController _pageController = PageController();
-  int _selectedIndex = 0;  // Keeps track of the selected button
+  int _selectedIndex = 0;
 
 
   String? _selectedContact;
@@ -25,7 +28,6 @@ class _ViewPagerWithSelectedButtonState extends State<ViewPagerWithSelectedButto
 
   void _onContactSelected(String contactName) {
     setState(() {
-      print("RanjeetTest ==========> contactName :"+contactName);
       _selectedContact = contactName;
       _refreshTime = DateTime.now();
       Utils.contactNumber='00'+contactName;
@@ -44,7 +46,8 @@ class _ViewPagerWithSelectedButtonState extends State<ViewPagerWithSelectedButto
      MoreScreen(),
    ];
 
-  @override
+
+   @override
   Widget build(BuildContext context) {
     
     return WillPopScope(

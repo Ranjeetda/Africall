@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_contacts/contact.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'app_colors.dart';
 
@@ -300,17 +299,6 @@ class Utils {
   }
 
 
-  static void showToastMessage() {
-    Fluttertoast.showToast(
-        msg: "Expense submitted successfully",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.black,
-        textColor: Colors.white,
-        fontSize: 16.0
-    );
-  }
 
   static String capitalize(String text) {
     if (text.isEmpty) return text;
@@ -406,9 +394,13 @@ class Utils {
     return parts.join(' ');
   }
 
+  static String formatTimestampDate(int timestampMillis) {
+    DateTime dt = DateTime.fromMillisecondsSinceEpoch(timestampMillis);
+    return DateFormat('yyyy-MM-dd').format(dt);
+  }
   static String formatTimestamp(int timestampMillis) {
     DateTime dt = DateTime.fromMillisecondsSinceEpoch(timestampMillis);
-    return DateFormat('yyyy-MM-dd                HH:mm').format(dt);
+    return DateFormat('HH:mm').format(dt);
   }
 
 }

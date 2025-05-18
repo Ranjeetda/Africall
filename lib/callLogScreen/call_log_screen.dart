@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:linphonesdk/linphoneSDK.dart';
 import 'package:intl/intl.dart';
 import 'package:linphonesdk_example/resourse/Utils.dart';
+import 'package:permission_handler/permission_handler.dart';
 
+import '../call_screen/call_screen.dart';
 import 'call_details_screen.dart';
 
 class CallLogScreen extends StatefulWidget {
@@ -18,11 +21,12 @@ class _CallLogScreen extends State<CallLogScreen> {
   static const EventChannel _eventChannel = EventChannel('com.example.linphone/events');
   static const MethodChannel _methodChannel = MethodChannel('com.example.linphone/call_log');
   StreamSubscription? _eventSubscription;
+  List<Contact>? _cachedContacts;
 
   @override
   void initState() {
     super.initState();
-    //callLogsssss();
+    requestPermissionsn();
     _eventSubscription = _eventChannel.receiveBroadcastStream().listen(
           (event) {
         print('Received event: $event');
@@ -100,6 +104,50 @@ class _CallLogScreen extends State<CallLogScreen> {
     }
   }
 
+  void loadContactName(String mNumber) async {
+    String? name = await getNameFromNumber(mNumber);
+    String displayName = name ?? "Unknown";
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CallScreen(mNumber, displayName),
+      ),
+    );
+  }
+
+
+  String? getNameFromNumber(String number) {
+    if (_cachedContacts == null) return null;
+    String cleanedInput = number.replaceAll(RegExp(r'\D'), '');
+
+    for (var contact in _cachedContacts!) {
+      for (var phone in contact.phones) {
+        String cleanedPhone = phone.number.replaceAll(RegExp(r'\D'), '');
+        if (cleanedPhone.endsWith(cleanedInput) ||
+            cleanedInput.endsWith(cleanedPhone)) {
+          return contact.displayName;
+        }
+      }
+    }
+    return null;
+  }
+
+  Future<void> requestPermissionsn() async {
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.phone,
+      Permission.microphone,
+      Permission.contacts,
+      Permission.bluetoothConnect
+    ].request();
+
+    if (statuses.values.any((status) => status != PermissionStatus.granted)) {
+      print("Not all permissions granted!");
+    } else {
+      print("All permissions granted!");
+      final contacts = await FlutterContacts.getContacts(withProperties: true);
+      _cachedContacts = contacts.toList();
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,12 +161,13 @@ class _CallLogScreen extends State<CallLogScreen> {
           return GestureDetector(
             onTap: () {
               print("Single tap on delete");
-              Navigator.push(
+              loadContactName(log['recipient']!);
+           /*   Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => CallDetailsScreen(callLogs),
                 ),
-              );
+              );*/
             },
             onLongPress: () {
               // Handle long press
@@ -147,10 +196,12 @@ class _CallLogScreen extends State<CallLogScreen> {
                         children: [
                           getCallIcon(log['direction'], log['status']),
                           SizedBox(width: 6),
-                          Text('${Utils.formatTimestamp(log['timestamp'])}'),
+                          Text('${Utils.formatTimestampDate(log['timestamp'])}'),
                           Spacer(),
-                          Text(Utils.formatDuration(log['duration']),
-                              style: TextStyle(fontSize: 13)),
+                          Text(Utils.formatDuration(log['duration']), style: TextStyle(fontSize: 13)),
+                          Spacer(),
+                          Text('${Utils.formatTimestamp(log['timestamp'])}'),
+
                         ],
                       ),
                     ],

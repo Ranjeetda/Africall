@@ -62,10 +62,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
           );
           PrefUtils.clearPreferences();
           PrefUtils.setLoggedIn(false);
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => LoginChoiceScreen()),
-                (Route<dynamic> route) => false,
-          );
+          Navigator.pop(context);
         } else {
           print("Get Change Password failed: ${responseMessage['message']}");
         }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:linphonesdk/call_state.dart';
 import 'package:linphonesdk/linphoneSDK.dart';
@@ -30,8 +31,10 @@ class _CallScreen extends State<CallScreen> {
 
   Timer? _callTimer;
   Duration _callDuration = Duration.zero;
-
   CallState? _currentCallState;
+
+  static const platform = MethodChannel('audio_channel');
+
 
   @override
   void initState() {
@@ -144,19 +147,16 @@ class _CallScreen extends State<CallScreen> {
   }
 
   Future<void> _connectToDevice() async {
-    // Request permissions
-    if (await Permission.bluetooth.request().isGranted &&
+    if (await Permission.bluetoothConnect.request().isGranted &&
+        await Permission.bluetoothScan.request().isGranted &&
         await Permission.location.request().isGranted) {
-      // Get paired devices
       List<BluetoothDevice> devices = await bluetooth.getBondedDevices();
       if (devices.isNotEmpty) {
-        // Example: Connect to the first paired device
         BluetoothDevice targetDevice = devices.first;
         try {
           BluetoothConnection connection =
           await BluetoothConnection.toAddress(targetDevice.address);
           print('Connected to ${targetDevice.name}');
-          // Handle connection (e.g., send/receive data)
           connection.input?.listen((data) {
             print('Data received: ${String.fromCharCodes(data)}');
           });
@@ -166,8 +166,20 @@ class _CallScreen extends State<CallScreen> {
       } else {
         print('No paired devices found');
       }
+    } else {
+      print('Bluetooth permissions not granted');
     }
   }
+
+
+  Future<void> startBluetoothSco() async {
+    try {
+      await platform.invokeMethod('startBluetoothSco');
+    } on PlatformException catch (e) {
+      print("Failed to start SCO: '${e.message}'.");
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -229,6 +241,7 @@ class _CallScreen extends State<CallScreen> {
                           case CallState.streamsRunning:
                             stopRingtone();
                             if (_callTimer == null) startCallTimer();
+                            startBluetoothSco();
                             break;
                           case CallState.released:
                             hangUp(context);
